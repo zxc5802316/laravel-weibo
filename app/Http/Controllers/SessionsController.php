@@ -17,7 +17,7 @@ class SessionsController extends Controller
             'email'=>'required|email|max:200',
             'password'=>'required|min:6'
         ]);
-        if (!\Auth::attempt($credentials)){
+        if (!\Auth::attempt($credentials,$request->has('remember'))){
             session()->flash('danger','用户名或密码错误！');
             return redirect()->back()->withInput();
         }
