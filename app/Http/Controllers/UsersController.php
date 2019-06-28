@@ -11,6 +11,8 @@ class UsersController extends Controller
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function create(){
+
+
         return view('users.create');
     }
 
@@ -20,6 +22,7 @@ class UsersController extends Controller
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function show(User $user){
+        //图片输出
         return view('users.show',compact('user'));
     }
 
@@ -29,5 +32,13 @@ class UsersController extends Controller
             'email'=>'required|email|unique:users,email|max:200',
             'password'=>'required|min:6|confirmed'
         ]);
+
+       $user =  User::create([
+            'name'=>$request->name,
+            'email'=>$request->email,
+            'password'=>bcrypt($request->password),
+        ]);
+        session()->flash('success','欢迎，您将在这里开启一段新的旅程~');
+       return redirect()->route('users.show',[$user]);
     }
 }
