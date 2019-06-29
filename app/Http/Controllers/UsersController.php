@@ -7,6 +7,16 @@ use Illuminate\Http\Request;
 
 class UsersController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth')->except([
+           'create', 'show','store'
+        ]);
+        $this->middleware('guest')->only('create');
+    }
+
+
+
     /**用户注册模板
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
@@ -69,18 +79,30 @@ class UsersController extends Controller
      */
     public function edit(User $user)
     {
+        $this->authorize("update",$user);
         return view('users.edit', compact('user'));
     }
+
+    /**资料更新
+     * @param User    $user
+     * @param Request $request
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws \Illuminate\Validation\ValidationException
+     */
     public function update(User $user,Request $request)
     {
+        $this->authorize("update",$user);
         $this->validate($request,[
             'name'=>'required|max:20',
-            'password'=>'required|confirmed|min:6'
+            'password'=>'nullable|confirmed|min:6'
         ]);
-        $user->update([
-            'name'=>$request->name,
-            'password'=>bcrypt($request->password),
-        ]);
+        $data['name']=$request->name;
+        if ($request->password){
+            $data['password']=bcrypt($request->password);
+        }
+        $user->update($data);
         session()->flash('success','资料更新成功');
         return redirect()->route('users.show',$user->id);
     }
