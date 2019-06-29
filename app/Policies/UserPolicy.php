@@ -16,4 +16,8 @@ class UserPolicy
    public function destroy(User $currenUsr,User $user){
        return $currenUsr->is_admin && $currenUsr->id !== $user->id;
    }
+
+   public function follow(User $currenUsr,User $user){
+       return  $currenUsr->id !== $user->id;
+   }
 }
